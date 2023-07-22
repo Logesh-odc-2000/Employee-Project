@@ -1,0 +1,258 @@
+EmpFrom.js
+
+import { Formik, Field, Form, ErrorMessage } from "formik"
+import * as Yup from 'yup'
+import { AiOutlineCloseCircle } from "react-icons/ai";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useState } from "react";
+
+
+export default function EmpForm({ close, formData, handeInputChange, handleSubmit }) {
+    const [startDate, setStartDate] = useState(null);
+  
+    const handleDateChange = (date) => {
+      setStartDate(date);
+    };
+  
+    let initValues = {
+      dob: '',
+      name: '',
+      email: '',
+      salary: '',
+      height: '',
+      doj: '',
+      startDate: '',
+      employeeStatus: "",
+    };
+  
+    const validationSchema = Yup.object().shape({
+      name: Yup.string()
+        .matches(/^[a-zA-Z.]+$/, "*Name must contain only letters and dots")
+        .required("Name is required"),
+      dob: Yup.date()
+        .required("*Date of birth is required")
+        .max(new Date("2005-12-31"), "Maximum allowed date is 2005-12-31")
+        .min(new Date("1970-01-01"), "Minimum allowed date is 1970-01-01"),
+      email: Yup.string()
+        .email("*Invalid email format")
+        .required("*Email is required"),
+      salary: Yup.number()
+        .required("*Salary is required")
+        .typeError("*Salary must be a number")
+        .positive("*Salary must be a positive value")
+        .min(100, "*Minimum salary allowed is 100 Rupees"),
+      height: Yup.number()
+        .typeError("*Height must be a number")
+        .positive("*Height must be a positive value")
+        .max(300, "*Height must be less than or equal to 300cm")
+        .required("*Height is required"),
+      startDate: Yup.date().required("Date of joining is required"),
+    });
+  
+    
+    const calculateDuration = () => {
+        if (startDate) {
+          const currentDate = new Date();
+          const diffInMilliseconds = Math.abs(currentDate - startDate);
+          const diffInDays = Math.floor(diffInMilliseconds / (1000 * 60 * 60 * 24));
+    
+          const years = Math.floor(diffInDays / 365);
+          const months = Math.floor((diffInDays % 365) / 30);
+          const days = diffInDays % 30;
+    
+          return `${years} year(s) ${months} month(s) ${days} day(s)`;
+        }
+    
+        return '';
+      };
+    
+    // const handleSubmit = () => {
+    //     const duration = calculateDuration();
+    //     console.log(duration);
+    // };
+
+    function closeModal() {
+        close();
+
+    }
+    return (
+        <div>
+        <div className="flex min-h-full flex-col justify-center py-2 sm:px-6 lg:px-8bg-white">
+          <button className="flex justify-end" onClick={closeModal}>
+            <AiOutlineCloseCircle className='text-2xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-xl' />
+          </button>
+          <div className='text-center py-2 text-2xl font-bold'>Employee Form</div>
+          <div className="sm:mx-auto sm:w-full sm:max-w-md">
+            <Formik
+              initialValues={initValues}
+              validationSchema={validationSchema}
+              onSubmit={handleSubmit}
+            >
+                 {({ errors, touched }) => (
+              <Form className="space-y-6">
+                <div>
+                  <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                    Name
+                  </label>
+                  <div className="mt-1">
+                    <Field
+                      id="name"
+                      name="name"
+                      type="text"
+                      value={formData.name}
+                      onChange={handeInputChange}
+                      className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                    />
+                             {errors.name && touched.name ? (
+            <ErrorMessage name="name" component="div" className="text-red-500" />
+           ) : null}
+
+                  </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    DOB
+                                </label>
+                                <div className="mt-1">
+                                    <Field
+                                        id="location"
+                                        name="dob"
+                                        type="date"
+                                        value={formData.dob}
+                                        autoComplete="dob"
+                                        onChange={handeInputChange}
+
+                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                    />
+                                    <ErrorMessage name="dob" component="div" className="text-red-500" />
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    email
+                                </label>
+                                <div className="mt-1">
+                                    <Field
+                                        id="address"
+                                        name="email"
+                                        type='email'
+                                        value={formData.email}
+                                        autoComplete="email"
+                                        onChange={handeInputChange}
+                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                    />
+                                    {/* <ErrorMessage name="email" component="div" className="text-red-500" /> */}
+                                </div>
+                            </div>
+
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    Salary
+                                </label>
+                                <div className="mt-1">
+                                    <Field
+                                        id="logo"
+                                        name="salary"
+                                        type="number"
+                                        value={formData.salary}
+                                        autoComplete="salary"
+                                        onChange={handeInputChange}
+                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                    />
+                                    {/* <ErrorMessage name="salary" component="div" className="text-red-500" /> */}
+
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    Height
+                                </label>
+                                <div className="mt-1">
+                                    <Field
+                                        // id="logo"
+                                        name="height"
+                                        type="number"
+                                        value={formData.height}
+                                        autoComplete="height"
+                                        onChange={handeInputChange}
+                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                    />
+                                    {/* <ErrorMessage name="height" component="div" className="text-red-500" /> */}
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+                                    Date of the joining
+                                </label>
+                                <div className="mt-1">
+                                    <DatePicker
+                                        name="startDate"
+                                        id="startDate"
+                                        selected={startDate}
+                                        onChange={handleDateChange}
+                                        dateFormat="dd-MM-yyyy"
+                                        className="block w-full appearance-none rounded-md border border-gray-300 px-3 py-2 placeholder-gray-400 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-indigo-500 sm:text-sm"
+                                    />
+                                    {/* <ErrorMessage name="startDate" component="div" className="text-red-500" /> */}
+                                </div>
+                            </div>
+                            <div>
+                                <label htmlFor="employeeStatus" className="block text-sm font-medium text-gray-700">
+                                    Current Employee
+                                </label>
+                                <div>
+                                    <Field
+                                        type="radio"
+                                        id="employeeStatusYes"
+                                        name="employeeStatus"
+                                        value="yes"
+                                        checked={formData.employeeStatus === "yes" || !formData.employeeStatus}
+                                        onChange={handeInputChange}
+                                        className="mr-2"
+                                    />
+                                    <label htmlFor="employeeStatusYes" className="mr-4">
+                                        Yes
+                                    </label>
+
+                                    <Field
+                                        type="radio"
+                                        id="employeeStatusNo"
+                                        name="employeeStatus"
+                                        value="no"
+                                        checked={formData.employeeStatus === "no"}
+                                        onChange={handeInputChange}
+                                        className="mr-2"
+                                        disabled={formData.employeeStatus === "no"}
+                                    />
+                                    <label htmlFor="employeeStatusNo">No</label>
+                                </div>
+                            </div>
+
+
+                            {/* <div>
+                                Duration: {calculateDuration()}
+                            </div> */}
+                            <div className="py-4">
+                                <button
+                                    values="Save" type="submit"
+                                    className="flex w-full   justify-center rounded-md border border-transparent bg-gradient-to-r from-purple-500 to-indigo-500 py-2 px-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        </Form>
+                 )}
+                    </Formik>
+                </div>
+            </div>
+        </div>
+
+    )
+
+}
+
+
+
